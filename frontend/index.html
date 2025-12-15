@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Демонстрация SQL-инъекций. Bookstore</title>
+    <link rel="stylesheet" href="../frontend/style.css">
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>Демонстрация SQL-инъекций и примеры защиты от них</h1>
+        <div id="user-info" class="user-info">
+            <!-- Будет заполнено позже -->
+        </div>
+    </header>
+
+    <div class="auth-section">
+        <h2>Система входа</h2>
+        <div class="form-group">
+            <label for="username">Логин:</label>
+            <input type="text" id="username" class="form-control" value="admin">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" class="form-control" value="admin">
+        </div>
+        <div class="button-group">
+            <button id="loginVulnerableBtn" class="btn btn-danger">Войти (уязвимый метод)</button>
+            <button id="loginSecureBtn" class="btn btn-success">Войти (безопасный метод)</button>
+            <button id="logoutBtn" class="btn btn-secondary">Выйти</button>
+        </div>
+        <div id="loginResult" class="result-box"></div>
+    </div>
+
+    <div class="demo-section">
+        <h2>Демонстрация SQL-инъекций</h2>
+
+        <div class="injection-example">
+            <h3>1. Классическая инъекция (Boolean-based)</h3>
+            <p>Попробуйте войти под администратором без знания пароля:</p>
+            <div class="form-group">
+                <label>Логин для инъекции:</label>
+                <input type="text" id="injectionUsername1" class="form-control injection-input"
+                       value="admin' -- ">
+            </div>
+            <div class="form-group">
+                <label>Пароль (любой):</label>
+                <input type="password" id="injectionPassword1" class="form-control injection-input"
+                       value="anything">
+            </div>
+            <button id="tryInjection1Btn" class="btn btn-warning">Попробовать инъекцию</button>
+            <div id="injectionResult1" class="result-box"></div>
+        </div>
+
+        <div class="injection-example">
+            <h3>2. Error-based инъекция</h3>
+            <p>Попробуйте получить информацию о структуре базы данных:</p>
+            <div class="form-group">
+                <label>Логин для инъекции:</label>
+                <input type="text" id="injectionUsername2" class="form-control injection-input"
+                       value="' UNION SELECT id,table_name,3,4,5,6,7 FROM information_schema.tables WHERE table_schema='public' AND '1'='1">
+            </div>
+            <div class="form-group">
+                <label>Пароль (любой):</label>
+                <input type="password" id="injectionPassword2" class="form-control injection-input"
+                       value="test">
+            </div>
+            <button id="tryInjection2Btn" class="btn btn-warning">Попробовать инъекцию</button>
+            <div id="injectionResult2" class="result-box"></div>
+        </div>
+
+        <div class="data-section">
+            <h3>3. Просмотр данных (требуются права администратора)</h3>
+            <button id="viewOrdersBtn" class="btn btn-primary">Показать заказы</button>
+            <button id="viewProductsBtn" class="btn btn-primary">Показать товары</button>
+            <div id="dataResult" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="protection-section">
+        <h2>Методы защиты</h2>
+        <ul>
+            <li><strong>Параметризованные запросы:</strong> Использование методов ORM для автоматического экранирования</li>
+            <li><strong>Валидация ввода:</strong> Проверка формата данных перед обработкой</li>
+            <li><strong>Обработка ошибок:</strong> Никогда не показывать детали ошибок СУБД пользователям</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>Курсовая работа по теме "SQL инъекции" Борченко А. С.</p>
+    </div>
+</div>
+
+<div id="loading" class="loading-overlay hidden">
+    <div class="loading-spinner"></div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
