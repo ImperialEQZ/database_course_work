@@ -126,6 +126,8 @@ class BookstoreApp {
         this.showLoading();
 
         try {
+            const originalUsername = username;
+
             const response = await fetch(`${this.apiBase}/auth/login-vulnerable`, {
                 method: 'POST',
                 headers: {
@@ -137,23 +139,12 @@ class BookstoreApp {
             const result = await response.json();
 
             if (result.success) {
-                let message = ` Инъекция успешна! Вход выполнен как ${result.user.name} (${result.user.role})`;
-
-                if (type === 1) {
-                    message += '\n\nЭто классическая SQL-инъекция, использующая комментарий (--), чтобы игнорировать проверку пароля.';
-                }
-
+                let message = `Инъекция успешна! Вход выполнен как ${result.user.name} (${result.user.role})`;
                 this.showResult(resultElement, message, 'injection');
                 this.updateUserInfo(result.user);
             } else {
-                // Показываем ошибку СУБД для error-based инъекции
                 const errorMessage = result.error || 'Неизвестная ошибка';
-                let message = ` Инъекция не удалась: ${errorMessage}`;
-
-                if (type === 2 && errorMessage.includes('information_schema')) {
-                    message = `ИНЪЕКЦИЯ ЧАСТИЧНО УСПЕШНА!\n\nОшибка СУБД содержит информацию о структуре базы данных:\n\n${errorMessage}`;
-                }
-
+                let message = `Инъекционный запрос:\n'${originalUsername}'\n\nРезультат выполнения:\n${errorMessage}`;
                 this.showResult(resultElement, message, 'injection');
             }
         } catch (error) {
